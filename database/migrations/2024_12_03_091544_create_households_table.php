@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('no_of_adults');
             $table->integer('no_of_children');
             $table->string('location')->nullable();
-            $table->foreignUuid('supervisor_id')->constrained('users')->onDelete('cascade'); // Foreign key for supervisor_id
+            $table->foreignId('supervisor_id')->constrained('users')->onDelete('cascade'); // Foreign key for supervisor_id
             $table->uuid('woreda_id');  
             $table->timestamps();
 

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('no_of_recovered');
             $table->date('date');
             $table->uuid('household_id'); 
-            $table->foreignUuid('supervisor_id')->constrained('users')->onDelete('cascade'); // Foreign key for supervisor_id
+            $table->foreignId('supervisor_id')->constrained('users')->onDelete('cascade'); // Foreign key for supervisor_id
             $table->timestamps();
 
             $table->foreign('household_id')->references('id')->on('households')->onDelete('cascade');
