@@ -7,6 +7,8 @@ use App\Models\Woreda;
 use App\Http\Resources\HouseholdResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+
 
 class HouseholdController extends Controller
 {

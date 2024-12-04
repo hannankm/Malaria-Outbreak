@@ -7,6 +7,8 @@ use App\Models\MalariaCase;
 use App\Http\Resources\MalariaCaseResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+
 
 class MalariaCaseController extends Controller
 {

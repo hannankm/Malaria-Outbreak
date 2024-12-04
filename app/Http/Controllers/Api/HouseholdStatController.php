@@ -7,6 +7,8 @@ use App\Models\HouseholdStat;
 use App\Http\Resources\HouseholdStatResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+
 
 class HouseholdStatController extends Controller
 {
