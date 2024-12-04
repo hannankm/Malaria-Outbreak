@@ -8,6 +8,10 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\ZoneController;
 use App\Http\Controllers\Api\WoredaController;
+use App\Http\Controllers\Api\HouseholdController;
+use App\Http\Controllers\Api\HouseholdStatController;
+use App\Http\Controllers\Api\MalariaCaseController;
+
 
 
 /*
@@ -33,3 +37,6 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 Route::resource('regions', RegionController::class);
 Route::resource('regions/{regionId}/zones', ZoneController::class);
 Route::resource('zones/{zoneId}/woredas', WoredaController::class);
+Route::resource('woreda/{woredaId}/households', HouseholdController::class);
+Route::resource('household/{householdId}/household-stats', HouseholdStatController::class);
+Route::resource('household-stat/{householdStatId}/malaria-cases', MalariaCaseController::class);
