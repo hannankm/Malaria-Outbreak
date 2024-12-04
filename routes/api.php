@@ -5,9 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\HiController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\RegionController;
-use App\Http\Controllers\Api\ZoneController;
-use App\Http\Controllers\Api\WoredaController;
+
 
 
 /*
@@ -28,8 +26,3 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-// ->middleware('api')->
-
-Route::resource('regions', RegionController::class);
-Route::resource('regions/{regionId}/zones', ZoneController::class);
-Route::resource('zones/{zoneId}/woredas', WoredaController::class);
