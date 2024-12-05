@@ -64,7 +64,7 @@ class User extends Authenticatable
     }
 
     const STATUS_PENDING = 'pending';
-    const STATUS_APPROVED = 'approved';
+    const STATUS_ACTIVE = 'active';
     const STATUS_SUSPENDED = 'suspended';
 
 
