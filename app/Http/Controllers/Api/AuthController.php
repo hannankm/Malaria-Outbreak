@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\PersonalAccessToken;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 
 
@@ -61,10 +63,12 @@ public function register(Request $request)
             'woreda_id' => $request->woreda_id ?? null,
             'region_id' => $request->region_id ?? null,
         ]);
+        // supervisor or region_admin
+
 
         // Assign the role to the user
-        // $role = Role::findByName($request->role);
-        // $user->assignRole($role);
+        $role = Role::findByName($request->role, 'api');
+        $user->assignRole($role);
 
         // Return a successful response
         return response()->json(['message' => 'User registered successfully. Your account is under review.'], 201);
@@ -106,6 +110,8 @@ public function login(Request $request)
         return response()->json([
             'message' => 'Login successful',
             'token' => $token,
+            'user' => $user->makeHidden(['roles']),
+            'role' => $user->getRoleNames(), // This will return the roles assigned to the user
         ], 200);
     }
 
@@ -120,4 +126,5 @@ public function login(Request $request)
             'message' => 'Successfully logged out',
         ], 200);
     }
+    
 }
