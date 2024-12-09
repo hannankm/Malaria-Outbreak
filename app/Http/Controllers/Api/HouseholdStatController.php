@@ -55,7 +55,7 @@ class HouseholdStatController extends Controller
             'no_of_death' => $request->no_of_death,
             'no_of_people_at_risk' => $request->no_of_people_at_risk,
             'no_of_recovered' => $request->no_of_recovered,
-            'date' => $request->date,
+            'date' => $request->date ?? now(),
             'household_id' => $household->id,
             'supervisor_id' => $request->supervisor_id,
         ]);
@@ -148,7 +148,7 @@ class HouseholdStatController extends Controller
             'no_of_death' => 'required|integer',
             'no_of_people_at_risk' => 'required|integer',
             'no_of_recovered' => 'required|integer',
-            'date' => 'required|date',
+            'date' => 'date',
             'supervisor_id' => 'required|exists:users,id',
         ]);
     }

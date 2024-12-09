@@ -145,8 +145,8 @@ class MalariaCaseController extends Controller
             'status' => 'required|string',
             'age_group' => 'required|string',
             'sex' => 'required|string',
-            'diagnosed' => 'required|date',
-            'household_stat_id' => 'required|exists:household_stats,id',  // Ensure this belongs to a valid HouseholdStat
+            'diagnosed' => 'required|boolean',
+            // 'household_stat_id' => 'required|exists:household_stats,id',  // Ensure this belongs to a valid HouseholdStat
         ]);
     }
 }
