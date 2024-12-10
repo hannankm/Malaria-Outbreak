@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 
 
 
+
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
