@@ -20,8 +20,13 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'phone_number' => $this->phone_number,
             'status' => $this->status,
-            'woreda' => $this->woreda->name, // Assuming the Woreda model has a 'name' field
-            'region' => $this->region->name, // Assuming the Region model has a 'name' field
+            'region' => $this->when($this->region_id, function () {
+                return $this->region ? $this->region->name : null; 
+            }),
+            'woreda' => $this->when($this->woreda_id, function () {
+                return $this->woreda ? $this->woreda->name : null; 
+            }),
+            'roles' => $this->roles->pluck('name'), 
             'created_at' => $this->created_at->toDateString(),
             'updated_at' => $this->updated_at->toDateString(),
         ];

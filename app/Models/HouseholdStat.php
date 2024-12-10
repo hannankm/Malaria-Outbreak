@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
 
 class HouseholdStat extends Model
 {
@@ -38,5 +40,9 @@ class HouseholdStat extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function malariaCases()
+{
+    return $this->hasMany(MalariaCase::class);
+}
 
 }

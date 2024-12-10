@@ -45,5 +45,9 @@ class Household extends Model
             $household->id = (string) Str::uuid(); 
         });
     }
+    public function householdStats()
+{
+    return $this->hasMany(HouseholdStat::class);
+}
 
 }

@@ -20,6 +20,11 @@ class Woreda extends Model
         return $this->belongsTo(Zone::class);
     }
 
+    public function households()
+    {
+        return $this->hasMany(Household::class);
+    }
+
     protected static function boot()
     {
         parent::boot();

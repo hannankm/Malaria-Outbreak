@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Zone;
 use App\Models\Woreda;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\WoredaResource;
+use App\Http\Controllers\Controller;
+
 
 class WoredaController extends Controller
 {

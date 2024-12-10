@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\PersonalAccessToken;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 
 
@@ -61,10 +63,12 @@ public function register(Request $request)
             'woreda_id' => $request->woreda_id ?? null,
             'region_id' => $request->region_id ?? null,
         ]);
+        // supervisor or region_admin
+
 
         // Assign the role to the user
-        // $role = Role::findByName($request->role);
-        // $user->assignRole($role);
+        $role = Role::findByName($request->role, 'api');
+        $user->assignRole($role);
 
         // Return a successful response
         return response()->json(['message' => 'User registered successfully. Your account is under review.'], 201);
@@ -76,38 +80,65 @@ public function register(Request $request)
 }
 
 public function login(Request $request)
-    {
-        // Create a validator instance for the login request
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string|min:8',
-        ]);
+{
+    // Create a validator instance for the login request
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|string|email',
+        'password' => 'required|string|min:8',
+    ]);
 
-        // Check if validation fails
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        // Check if the user exists
-        $user = User::where('email', $request->email)->first();
-
-        // If user doesn't exist or password is incorrect
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
-        }
-
-        // Create and return the API token
-        $token = $user->createToken('MalariaApp')->plainTextToken;
-
+    // Check if validation fails
+    if ($validator->fails()) {
         return response()->json([
-            'message' => 'Login successful',
-            'token' => $token,
-        ], 200);
+            'errors' => $validator->errors()
+        ], 422);
     }
+
+    // Check if the user exists
+    $user = User::where('email', $request->email)->first();
+
+    // If user doesn't exist or password is incorrect
+    if (!$user || !Hash::check($request->password, $user->password)) {
+        throw ValidationException::withMessages([
+            'email' => ['The provided credentials are incorrect.'],
+        ]);
+    }
+
+    // Check the user's status before proceeding with login
+    if ($user->status === 'pending') {
+        // Return a response if the account is pending
+        return response()->json([
+            'message' => 'Your account is under review. Please wait until it is approved.',
+        ], 403);
+    }
+
+    if ($user->status === 'suspended') {
+        // Return a response if the account is suspended
+        return response()->json([
+            'message' => 'Your account has been suspended. Contact support for more information.',
+        ], 403);
+    }
+
+    if ($user->status !== 'active') {
+        // If account is neither active, pending, nor suspended, return an appropriate message
+        return response()->json([
+            'message' => 'Your account is not active. Please contact support.',
+        ], 403);
+    }
+
+    // Create the API token if status is active
+    $token = $user->createToken('MalariaApp')->plainTextToken;
+
+    // Return the successful response with token and user info
+    return response()->json([
+        'message' => 'Login successful',
+        'token' => $token,
+        // 'user' => $user->makeHidden(['roles']), // Hide roles in the response
+        'user' => $user, // Hide roles in the response
+        'role' => $user->getRoleNames(), // Get and return the roles assigned to the user
+    ], 200);
+}
+
 
     public function logout(Request $request)
     {
@@ -120,4 +151,5 @@ public function login(Request $request)
             'message' => 'Successfully logged out',
         ], 200);
     }
+    
 }
