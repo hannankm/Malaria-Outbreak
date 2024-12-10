@@ -30,7 +30,7 @@ public function register(Request $request)
         'password' => 'required|string|confirmed|min:8',
         'phone_number' => 'required|string|max:20',
         'woreda_id' => 'uuid|exists:woredas,id',
-        'region_id' => 'uuid|exists:regions,id',
+        'region_id' => 'required|uuid|exists:regions,id',
         'role' => 'required|string',
     ];
 
