@@ -1,13 +1,8 @@
-import { defineStore } from 'pinia';
+import { createStore } from "vuex";
+import user from "./modules/user";
 
-export const useRegionStore = defineStore('region', {
-  state: () => ({
-    regions: [],
-  }),
-  actions: {
-    async fetchRegions() {
-      const response = await axios.get('/api/regions');
-      this.regions = response.data;
+export default createStore({
+    modules: {
+        user, // Add user module
     },
-  },
 });
