@@ -7,12 +7,12 @@
             <el-table-column label="#" type="index" width="50" />
 
             <el-table-column
-                prop="houseNumber"
+                prop="house_number"
                 label="House Number"
                 width="200"
             />
 
-            <el-table-column prop="name" label="Name" width="300" />
+            <el-table-column prop="full_name" label="Name" width="300" />
 
             <el-table-column label="Action" align="center">
                 <template #default="scope">
@@ -43,7 +43,14 @@ export default {
         async fetchHouseholds() {
             try {
                 const response = await getHouseholds();
-                this.households = response.data;
+                this.households = response.data.data;
+                console.log(response.data); // Check the actual response
+                if (Array.isArray(response.data.data)) {
+                    this.households = response.data.data;
+                } else {
+                    console.error("Expected an array but got:", response.data);
+                    this.households = []; // Default to an empty array
+                }
             } catch (error) {
                 console.error("Error fetching households:", error);
             }
