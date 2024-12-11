@@ -1,33 +1,62 @@
-import axios from 'axios';
+// resources/api/region.js
+import apiService from "@/utils/apiService";
 
-const apiClient = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api',
-  withCredentials: false,
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-  },
-});
-
-apiClient.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+export const fetchRegions = async () => {
+  try {
+    const response = await apiService.get("/regions");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching regions:", error);
+    throw error;
   }
-  return config;
-});
+};
 
-export default {
-  getRegions(search = '') {
-    return apiClient.get('/regions', { params: { search } });
-  },
-  createRegion(region) {
-    return apiClient.post('/regions', region);
-  },
-  updateRegion(regionId, region) {
-    return apiClient.put(`/regions/${regionId}`, region);
-  },
-  deleteRegion(regionId) {
-    return apiClient.delete(`/regions/${regionId}`);
-  },
+export const fetchRegion = async (regionId) => {
+  try {
+    const response = await apiService.get(`/regions/${regionId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching region with ID ${regionId}:`, error);
+    throw error;
+  }
+};
+
+export const createRegion = async (data) => {
+  try {
+    const response = await apiService.post("/regions", data);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating region:", error);
+    throw error;
+  }
+};
+
+export const updateRegion = async (regionId, data) => {
+  try {
+    const response = await apiService.put(`/regions/${regionId}`, data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating region with ID ${regionId}:`, error);
+    throw error;
+  }
+};
+
+export const deleteRegion = async (regionId) => {
+  try {
+    const response = await apiService.delete(`/regions/${regionId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting region with ID ${regionId}:`, error);
+    throw error;
+  }
+};
+
+export const fetchZones = async (regionId) => {
+  try {
+    const response = await apiService.get(`/regions/${regionId}/zones`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching zones for region with ID ${regionId}:`, error);
+    throw error;
+  }
 };

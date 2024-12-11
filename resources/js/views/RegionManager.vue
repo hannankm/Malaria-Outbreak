@@ -2,137 +2,209 @@
   <div>
     <h1>Region Manager</h1>
 
-    <!-- Search Input -->
-    <el-input 
-      v-model="searchQuery" 
-      placeholder="Search Regions" 
-      @input="fetchRegions" 
-      class="mb-4"
-    ></el-input>
+    <!-- Search Section -->
+    <div class="search-section">
+      <input
+        v-model="searchQuery"
+        @input="searchRegions"
+        type="text"
+        placeholder="Search Regions..."
+      />
+    </div>
 
-    <!-- Create Button -->
-    <el-button type="primary" @click="showCreateDialog">Create Region</el-button>
+    <!-- Add New Region -->
+    <div class="form-section">
+      <input
+        v-model="newRegion.name"
+        type="text"
+        placeholder="Enter Region Name"
+      />
+      <button @click="createRegion">Create Region</button>
+    </div>
 
-    <!-- Region Table -->
-    <el-table :data="filteredRegions" stripe style="width: 100%" class="mt-4">
-      <el-table-column prop="name" label="Region Name"></el-table-column>
-      <el-table-column label="Actions">
-        <template #default="scope">
-          <el-button size="mini" @click="showEditDialog(scope.row)">Edit</el-button>
-          <el-button size="mini" type="danger" @click="deleteRegion(scope.row.id)">Delete</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <!-- List of Regions -->
+    <div class="region-list">
+      <table>
+        <thead>
+          <tr>
+            <th>Region Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="region in regions" :key="region.id">
+            <td>{{ region.name }}</td>
+            <td>
+              <button @click="editRegion(region)">Edit</button>
+              <button @click="deleteRegion(region.id)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <!-- Create/Edit Dialog -->
-    <el-dialog :visible.sync="isDialogVisible" title="Region">
-      <el-form :model="regionForm">
-        <el-form-item label="Name" :label-width="formLabelWidth">
-          <el-input v-model="regionForm.name"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="isDialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="saveRegion">Save</el-button>
+    <!-- Edit Modal -->
+    <div v-if="showEditModal" class="modal">
+      <div class="modal-content">
+        <h3>Edit Region</h3>
+        <input v-model="currentRegion.name" type="text" />
+        <button @click="updateRegion">Save Changes</button>
+        <button @click="closeEditModal">Cancel</button>
       </div>
-    </el-dialog>
+    </div>
   </div>
 </template>
 
 <script>
-import { 
-  fetchRegions, 
-  createRegion, 
-  updateRegion, 
-  deleteRegion 
-} from "../api/region";
+import { fetchRegions, createRegion, updateRegion, deleteRegion } from "@/api/region";
 
 export default {
   data() {
     return {
-      regions: [], // Full list of regions from the database
-      searchQuery: "", // Query for searching regions
-      isDialogVisible: false, // Dialog visibility state
-      isEditMode: false, // Editing state
-      regionForm: {
-        id: "",
-        name: "",
-      },
-      formLabelWidth: "120px",
+      regions: [], // List of regions
+      searchQuery: "", // For search functionality
+      newRegion: { name: "" }, // Input field for creating a region
+      showEditModal: false, // Controls visibility of Edit Modal
+      currentRegion: { id: null, name: "" }, // Currently selected region for editing
     };
   },
-  computed: {
-    // Computed property for filtered regions based on the search query
-    filteredRegions() {
-      if (!this.searchQuery) {
-        return this.regions;
-      }
-      return this.regions.filter((region) =>
-        region.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    },
+  created() {
+    this.loadRegions();
   },
   methods: {
-    // Fetch regions from the database
-    async fetchRegions() {
+    // Fetch all regions
+    async loadRegions() {
       try {
         const response = await fetchRegions();
-        this.regions = response.data; // Assuming the API returns an array of regions
+        this.regions = response; // Populate regions list
       } catch (error) {
-        console.error("Error fetching regions:", error);
+        console.error("Error loading regions:", error);
       }
     },
 
-    // Show the dialog for creating a new region
-    showCreateDialog() {
-      this.isEditMode = false;
-      this.regionForm = { id: "", name: "" };
-      this.isDialogVisible = true;
-    },
-
-    // Show the dialog for editing an existing region
-    showEditDialog(region) {
-      this.isEditMode = true;
-      this.regionForm = { ...region };
-      this.isDialogVisible = true;
-    },
-
-    // Save a region (create or update)
-    async saveRegion() {
+    // Search regions dynamically
+    async searchRegions() {
       try {
-        if (this.isEditMode) {
-          await updateRegion(this.regionForm.id, { name: this.regionForm.name });
+        if (this.searchQuery.trim() === "") {
+          this.loadRegions();
         } else {
-          await createRegion({ name: this.regionForm.name });
+          const response = await fetchRegions();
+          this.regions = response.filter((region) =>
+            region.name.toLowerCase().includes(this.searchQuery.toLowerCase())
+          );
         }
-        this.isDialogVisible = false;
-        this.fetchRegions();
       } catch (error) {
-        console.error("Error saving region:", error);
+        console.error("Error searching regions:", error);
+      }
+    },
+
+    // Create a new region
+    async createRegion() {
+      try {
+        if (!this.newRegion.name.trim()) {
+          alert("Please provide a valid name.");
+          return;
+        }
+
+        await createRegion({ name: this.newRegion.name });
+        this.newRegion.name = "";
+        this.loadRegions();
+      } catch (error) {
+        console.error("Error creating region:", error);
       }
     },
 
     // Delete a region
-    async deleteRegion(regionId) {
+    async deleteRegion(id) {
       try {
-        await deleteRegion(regionId);
-        this.fetchRegions();
+        if (confirm("Are you sure you want to delete this region?")) {
+          await deleteRegion(id);
+          this.loadRegions();
+        }
       } catch (error) {
         console.error("Error deleting region:", error);
       }
     },
-  },
-  mounted() {
-    this.fetchRegions();
+
+    // Open Edit Modal
+    editRegion(region) {
+      this.showEditModal = true;
+      this.currentRegion = { ...region };
+    },
+
+    // Close Edit Modal
+    closeEditModal() {
+      this.showEditModal = false;
+      this.currentRegion = { id: null, name: "" };
+    },
+
+    // Update region in database
+    async updateRegion() {
+      try {
+        if (!this.currentRegion.name.trim()) {
+          alert("Region name cannot be empty.");
+          return;
+        }
+
+        await updateRegion(this.currentRegion.id, { name: this.currentRegion.name });
+        this.closeEditModal();
+        this.loadRegions();
+      } catch (error) {
+        console.error("Error updating region:", error);
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-.mb-4 {
-  margin-bottom: 1rem;
+/* General Styling */
+h1 {
+  margin-bottom: 10px;
 }
-.mt-4 {
-  margin-top: 1rem;
+
+.search-section {
+  margin: 10px 0;
+}
+
+.form-section {
+  margin: 10px 0;
+}
+
+.region-list table {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+}
+
+.region-list th,
+.region-list td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+button {
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+/* Modal Styling */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
 }
 </style>

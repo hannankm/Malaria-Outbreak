@@ -13,14 +13,26 @@ use App\Http\Controllers\Controller;
 class ZoneController extends Controller
 {
     // Display a listing of the zones for a specific region
-    public function index($regionId)
+    public function index(Request $request, $regionId)
     {
+        // Find the region by ID
         $region = Region::findOrFail($regionId);
-
-        // Use ZoneResource for structured response
-        return ZoneResource::collection($region->zones);
+    
+        // Retrieve the 'search' query parameter
+        $search = $request->query('search');
+    
+        // Build the query for zones related to the region
+        $zonesQuery = $region->zones();
+    
+        // If the 'search' parameter is provided, filter zones by name
+        if ($search) {
+            $zonesQuery->where('name', 'like', '%' . $search . '%');
+        }
+    
+        // Execute the query and return the response using ZoneResource
+        return ZoneResource::collection($zonesQuery->get());
     }
-
+    
     // Store a newly created zone
     public function store(Request $request, $regionId)
     {
