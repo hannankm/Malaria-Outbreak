@@ -36,12 +36,7 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 
 // ->middleware('api')->
 
-Route::resource('regions', RegionController::class);
-Route::resource('regions/{regionId}/zones', ZoneController::class);
-Route::resource('zones/{zoneId}/woredas', WoredaController::class);
-Route::resource('woredas/{woredaId}/households', HouseholdController::class);
-Route::resource('household/{householdId}/household-stats', HouseholdStatController::class);
-Route::resource('household-stat/{householdStatId}/malaria-cases', MalariaCaseController::class);
+
 
 
 
