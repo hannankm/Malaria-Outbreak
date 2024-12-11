@@ -18,17 +18,33 @@ class HouseholdController extends Controller
      * @param  int  $woredaId
      * @return \Illuminate\Http\Response
      */
-    public function index($woredaId)
-    {
-        // Find the woreda
-        $woreda = Woreda::findOrFail($woredaId);
+    public function index(Request $request, $woredaId)
+{
+    // Find the woreda
+    $woreda = Woreda::findOrFail($woredaId);
 
-        // Get households belonging to this woreda
-        $households = $woreda->households()->get();
+    // Initialize query builder for households
+    $query = $woreda->households();
 
-        // Return households as a collection
-        return HouseholdResource::collection($households);
+    // Check if there's a search query in the request
+    if ($request->has('search') && $request->search != '') {
+        $searchTerm = $request->search;
+
+        // Apply search filters, assuming you're searching on name, house number, or location
+        $query->where(function ($q) use ($searchTerm) {
+            $q->where('house_number', 'like', '%' . $searchTerm . '%')
+              ->orWhere('full_name', 'like', '%' . $searchTerm . '%')
+              ->orWhere('location', 'like', '%' . $searchTerm . '%');
+        });
     }
+
+    // Get filtered households
+    $households = $query->get();
+
+    // Return households as a collection
+    return HouseholdResource::collection($households);
+}
+
 
     /**
      * Store a newly created household for a specific woreda.
