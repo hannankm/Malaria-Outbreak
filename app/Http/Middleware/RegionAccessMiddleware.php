@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
@@ -25,7 +24,13 @@ class RegionAccessMiddleware
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        // Role checks
+        // If user is super admin, allow access
+        if ($user->hasRole('super_admin')) {
+            // Super Admin can access all data, so skip further checks
+            return $next($request);
+        }
+
+        // Role checks for other roles (region_admin and supervisor)
         if ($role === 'region_admin') {
             // Check if user is a region admin
             if ($user->hasRole('region_admin')) {
@@ -37,32 +42,6 @@ class RegionAccessMiddleware
                 if ($routeRegionId && $routeRegionId != $regionId) {
                     return response()->json(['error' => 'Forbidden: You can only access your own region data'], 403);
                 }
-    
-            //     // Check for zoneId, woredaId, and householdId in similar fashion
-            //     $routeZoneId = $request->route('zoneId');
-            //     $routeWoredaId = $request->route('woredaId');
-            //     $routeHouseholdId = $request->route('householdId');
-    
-            //     // If route has zoneId, check it
-            //     if ($routeZoneId) { 
-            //         // find region id of zone and check with user region id
-            //         if ($user->region_id != $routeZoneId)
-            //      {
-            //         return response()->json(['error' => 'Forbidden: You can only access data within your region\'s zones'], 403);
-            //     }
-            // }
-            //     // If route has woredaId, check it
-            //     if ($routeWoredaId) { 
-            //         // find woreda zone id then zone's region id and check with user region id
-            //         if( $user->region_id != $request->route('woredaId')) {
-            //         return response()->json(['error' => 'Forbidden: You can only access data within your region\'s woredas'], 403);
-            //     }
-            // }
-            //     // If route has householdId, check it
-            //     if ($routeHouseholdId && $user->region_id != $request->route('householdId')) {
-            //         return response()->json(['error' => 'Forbidden: You can only access your own region\'s households'], 403);
-            //     }
-    
             } else {
                 return response()->json(['error' => 'Forbidden: You do not have access to this resource'], 403);
             }
@@ -78,24 +57,12 @@ class RegionAccessMiddleware
                 if ($routeWoredaId && $routeWoredaId != $woredaId) {
                     return response()->json(['error' => 'Forbidden: You can only access your own woreda data'], 403);
                 }
-    
-                // // Check for householdId in similar fashion
-                // $routeHouseholdId = $request->route('householdId');
-                // if ($routeHouseholdId && $user->woreda_id != $request->route('householdId')) {
-                //     return response()->json(['error' => 'Forbidden: You can only access your own woreda\'s households'], 403);
-                // }
-    
             } else {
                 return response()->json(['error' => 'Forbidden: You do not have access to this resource'], 403);
             }
     
-        } elseif ($role === 'super_admin') {
-            // Super Admin can access all data
-            if (!$user->hasRole('super_admin')) {
-                return response()->json(['error' => 'Forbidden: You do not have access to this resource'], 403);
-            }
         }
-    
+
         // Continue to the next request if checks pass
         return $next($request);
     }
