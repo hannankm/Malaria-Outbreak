@@ -7,6 +7,7 @@ import Homepage from '../views/homepage.vue'; // Ensure this matches
 import Login from '../views/login.vue';
 import Register from '../views/register.vue';
 import About from '../views/About.vue'
+import RegionManager from '../views/RegionManager.vue'
 const routes = [
   { path: '/', component: Homepage },
   { path: '/login', component: Login }, 
@@ -18,6 +19,7 @@ const routes = [
   // { path: '/about', component: () => import('@/views/About.vue') },
   // { path: '/login', component: () => import('@/views/Login.vue') },
   // { path: '/register', component: () => import('@/views/Register.vue') },
+   { path: '/regions', component: RegionManager},
 ];
 
 const router = createRouter({
