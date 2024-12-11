@@ -6,23 +6,19 @@ import HouseholdPage from '../components/HouseholdPage.vue';
 import Homepage from '../views/homepage.vue'; // Ensure this matches
 import Login from '../views/login.vue';
 import Register from '../views/register.vue';
+import RegionManager from '../views/RegionManager.vue'
 import About from '../views/About.vue'
-const routes = [
-  { path: '/', component: Homepage },
-  { path: '/login', component: Login }, 
-  { path: '/register', component: Register }, 
-  { path: '/about', component: About }, // Ensure this matches the import name
-  { path: '/regions/:regionId/zones', component: ZonePage },
-  { path: '/zones/:zoneId/woredas', component: WoredaPage },
-  { path: '/woredas/:woredaId/households', component: HouseholdPage },
-  // { path: '/about', component: () => import('@/views/About.vue') },
-  // { path: '/login', component: () => import('@/views/Login.vue') },
-  // { path: '/register', component: () => import('@/views/Register.vue') },
-];
+
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes: [
+    { path: '/', component: Homepage },
+    { path: '/login', component: Login },
+    { path: '/register', component: Register },
+    { path: '/about', component: About },
+    { path: '/regions', component: RegionManager },
+  ],
 });
 
 export default router;

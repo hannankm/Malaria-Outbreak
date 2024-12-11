@@ -8,6 +8,7 @@
         <h1 class="animated-text">Welcome to Malaria Outbreak Registration</h1>
         <p>Track and manage malaria outbreaks effectively.</p>
         <el-button type="primary" @click="navigateTo('register')">Get Started</el-button>
+        <el-button type="secondary" @click="navigateTo('regions')">Region Manager</el-button> 
       </div>
       <!-- <div class="link-buttons">
         <el-button @click="navigateTo('login')">Login</el-button>
@@ -96,7 +97,10 @@
     margin-top: 20px;
     animation: fade-in 3s ease-in-out;
   }
-  
+  .hero .el-button:nth-child(2) {
+  margin-left: 10px;
+}
+
   .link-buttons {
     display: flex;
     justify-content: center;

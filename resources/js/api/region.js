@@ -1,45 +1,33 @@
-import request from '@/utils/request';
+import axios from 'axios';
 
-export function fetchRegions() {
-  return request({
-    url: '/regions',
-    method: 'get',
-  });
-}
+const apiClient = axios.create({
+  baseURL: 'http://127.0.0.1:8000/api',
+  withCredentials: false,
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
 
-export function fetchRegion(regionId) {
-  return request({
-    url: `/regions/${regionId}`,
-    method: 'get',
-  });
-}
+apiClient.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-export function createRegion(data) {
-  return request({
-    url: '/regions',
-    method: 'post',
-    data: data,
-  });
-}
-
-export function updateRegion(regionId, data) {
-  return request({
-    url: `/regions/${regionId}`,
-    method: 'put',
-    data: data,
-  });
-}
-
-export function deleteRegion(regionId) {
-  return request({
-    url: `/regions/${regionId}`,
-    method: 'delete',
-  });
-}
-
-export function fetchZones(regionId) {
-  return request({
-    url: `/regions/${regionId}/zones`,
-    method: 'get',
-  });
-}
+export default {
+  getRegions(search = '') {
+    return apiClient.get('/regions', { params: { search } });
+  },
+  createRegion(region) {
+    return apiClient.post('/regions', region);
+  },
+  updateRegion(regionId, region) {
+    return apiClient.put(`/regions/${regionId}`, region);
+  },
+  deleteRegion(regionId) {
+    return apiClient.delete(`/regions/${regionId}`);
+  },
+};
