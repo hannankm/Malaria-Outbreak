@@ -1,10 +1,9 @@
 import apiService from "@/utils/apiService";
 import store from "@/store";
 
-const woredaId = store.getters["user/woredaId"];
-
 export const getHouseholds = () => {
-    return apiService.get(`/woredas/${woredaId}/households`); // API endpoint to fetch households
+    const woredaId = store.getters["user/woredaId"];
+    return apiService.get(`/woredas/${woredaId}/households`);
 };
 
 export const getHouseholdById = (id) => {
