@@ -4,13 +4,15 @@ import Login from "../views/login.vue";
 import Register from "../views/register.vue";
 import About from "../views/About.vue";
 import householdRoutes from "./householdRoutes";
+import dashboardRoutes from "./dashboardRoutes";
 
 const routes = [
-    { path: "/", component: Homepage },
-    { path: "/login", component: Login },
-    { path: "/register", component: Register },
+    { path: "/", component: Homepage, name: "Home" },
+    { path: "/login", component: Login, name: "Login" },
+    { path: "/register", component: Register, name: "Register" },
     { path: "/about", component: About }, // Ensure this matches the import name
     ...householdRoutes, // Spread the household routes here
+    ...dashboardRoutes,
 ];
 
 const router = createRouter({

@@ -1,6 +1,7 @@
 // src/router/householdRoutes.js
 import HouseholdView from "@/views/Household/HouseholdView.vue";
 import HouseholdDetail from "@/views/Household/HouseholdDetail.vue";
+import AddHousehold from "@/views/Household/AddHousehold.vue";
 
 const householdRoutes = [
     {
@@ -15,6 +16,11 @@ const householdRoutes = [
         component: HouseholdDetail,
         props: true,
         meta: { title: "Household Details" },
+    },
+    {
+        path: "/households/add",
+        name: "AddHousehold",
+        component: AddHousehold,
     },
 ];
 
