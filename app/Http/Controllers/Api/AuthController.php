@@ -21,64 +21,67 @@ class AuthController extends Controller
     //
 
 
-public function register(Request $request)
-{
-    // Define the validation rules
-    $rules = [
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|confirmed|min:8',
-        'phone_number' => 'required|string|max:20',
-        'woreda_id' => 'uuid|exists:woredas,id',
-        'region_id' => 'required|uuid|exists:regions,id',
-        'role' => 'required|string',
-    ];
-
-    // Define custom error messages (optional)
-    $messages = [
-        'email.unique' => 'This email is already registered.',
-        'password.confirmed' => 'Password confirmation does not match.',
-    ];
-
-    // Create the validator instance
-    $validator = Validator::make($request->all(), $rules, $messages);
-
-    // Check if the validation passes
-    if ($validator->fails()) {
-        // Return the validation errors if validation fails
-        return response()->json([
-            'errors' => $validator->errors()
-        ], 422);  // 422 Unprocessable Entity
+    public function register(Request $request)
+    {
+        // Base validation rules
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|confirmed|min:8',
+            'password_confirmation' => 'required|string|same:password',
+            'phone_number' => 'required|string|max:20',
+            'region_id' => 'required|uuid|exists:regions,id',
+            'role' => 'required|string',
+        ];
+    
+        // Additional rules for supervisors
+        if ($request->role === 'supervisor') {
+            $rules['woreda_id'] = 'required|uuid|exists:woredas,id';
+        } else {
+            $rules['woreda_id'] = 'nullable|uuid|exists:woredas,id';
+        }
+    
+        // Custom error messages
+        $messages = [
+            'email.unique' => 'This email is already registered.',
+            'password.confirmed' => 'Password confirmation does not match.',
+            'woreda_id.required' => 'Woreda is required for supervisors.',
+        ];
+    
+        // Validate the request
+        $validator = Validator::make($request->all(), $rules, $messages);
+    
+        if ($validator->fails()) {
+            // Return validation errors
+            return response()->json([
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+    
+        try {
+            // Proceed with user creation
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'phone_number' => $request->phone_number,
+                'status' => User::STATUS_PENDING, // Default status as 'pending'
+                'woreda_id' => $request->woreda_id ?? null,
+                'region_id' => $request->region_id ?? null,
+            ]);
+    
+            // Assign the role to the user
+            $role = Role::findByName($request->role, 'api');
+            $user->assignRole($role);
+    
+            // Return success response
+            return response()->json(['message' => 'User registered successfully. Your account is under review.'], 201);
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            return response()->json(['error' => 'Registration failed. ' . $e->getMessage()], 500);
+        }
     }
-
-    // Proceed with registration if validation passes
-    try {
-        // Create the user with the provided data
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone_number' => $request->phone_number,
-            'status' => User::STATUS_PENDING, // Default status as 'pending'
-            'woreda_id' => $request->woreda_id ?? null,
-            'region_id' => $request->region_id ?? null,
-        ]);
-        // supervisor or region_admin
-
-
-        // Assign the role to the user
-        $role = Role::findByName($request->role, 'api');
-        $user->assignRole($role);
-
-        // Return a successful response
-        return response()->json(['message' => 'User registered successfully. Your account is under review.'], 201);
-
-    } catch (\Exception $e) {
-        // Handle any exceptions or errors
-        return response()->json(['error' => 'Registration failed. ' . $e->getMessage()], 500);
-    }
-}
-
+    
 public function login(Request $request)
 {
     // Create a validator instance for the login request

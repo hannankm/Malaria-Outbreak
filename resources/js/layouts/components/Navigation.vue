@@ -5,6 +5,7 @@
         <el-menu-item index="2" @click="navigateTo('about')">About</el-menu-item>
         <el-menu-item index="3" @click="navigateTo('login')">Login</el-menu-item>
         <el-menu-item index="4" @click="navigateTo('register')">Register</el-menu-item>
+        <el-menu-item index="5" @click="navigateTo('region')">Region manager </el-menu-item>
       </el-menu>
     </el-header>
   </template>

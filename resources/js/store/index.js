@@ -6,3 +6,4 @@ export default createStore({
         user, // Add user module
     },
 });
+

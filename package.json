@@ -7,6 +7,7 @@
     "devDependencies": {
         "@babel/core": "^7.26.0",
         "@babel/preset-env": "^7.26.0",
+        "@vue/cli-plugin-typescript": "^5.0.8",
         "@vue/eslint-config-prettier": "^10.1.0",
         "axios": "^0.25",
         "eslint-plugin-vue": "^9.32.0",
@@ -20,6 +21,7 @@
         "sass-loader": "^12.6.0",
         "script-loader": "^0.7.2",
         "svg-sprite-loader": "^6.0.11",
+        "typescript": "^5.7.2",
         "unplugin-auto-import": "^0.7.1",
         "unplugin-vue-components": "^0.19.3"
     },

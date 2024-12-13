@@ -10,11 +10,40 @@ use App\Http\Controllers\Controller;
 class RegionController extends Controller
 {
     // Display a listing of the regions
-    public function index()
-    {
-        // Use RegionResource to format the response
-        return RegionResource::collection(Region::with('zones.woredas')->get());
+    public function index(Request $request)
+{
+    // Check for a 'search' query parameter in the request
+    $search = $request->query('search');
+
+    // Build the query for regions
+    $regionsQuery = Region::with('zones.woredas');
+
+    // If the 'search' parameter is provided, filter the regions by name
+    if ($search) {
+        $regionsQuery->where('name', 'like', '%' . $search . '%');
     }
+
+    // Execute the query and return the formatted response
+    return RegionResource::collection($regionsQuery->get());
+}
+
+// In RegionController.php
+public function dropdown(Request $request)
+{
+    $search = $request->query('search'); // Optional search parameter
+
+    $regionsQuery = Region::query();
+
+    if ($search) {
+        $regionsQuery->where('name', 'like', '%' . $search . '%');
+    }
+
+    return response()->json(
+        $regionsQuery->select('id', 'name')->get()
+    );
+}
+
+
 
     // Store a newly created region
     public function store(Request $request)
