@@ -15,6 +15,7 @@ class HouseholdStat extends Model
         'no_of_active_cases',
         'no_of_death',
         'no_of_people_at_risk',
+        'no_of_new_cases',
         'no_of_recovered',
         'date',
         'household_id',
