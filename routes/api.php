@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\WoredaController;
 use App\Http\Controllers\Api\HouseholdController;
 use App\Http\Controllers\Api\HouseholdStatController;
 use App\Http\Controllers\Api\MalariaCaseController;
+use App\Http\Controllers\Api\DashboardController;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
@@ -33,6 +34,10 @@ use Spatie\Permission\Models\Permission;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth:sanctum');
+Route::resource('/regions', RegionController::class);
+    Route::resource('/zones/{zoneId}/woredas', WoredaController::class);
+    Route::resource('/regions/{regionId}/zones', ZoneController::class);
 
 // ->middleware('api')->
 
@@ -42,11 +47,8 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 
 // Super Admin route
 Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
-    Route::resource('regions', RegionController::class);
-    Route::resource('zones/{zoneId}/woredas', WoredaController::class);
-    Route::resource('regions/{regionId}/zones', ZoneController::class);
+    
     Route::resource('user', UserController::class);
-    Route::get('/dashboard', [DashboardController::class, 'viewAll']);
 });
 
 // Region Admin route
@@ -55,7 +57,6 @@ Route::middleware(['auth:sanctum', 'role:region_admin', 'region_access:region_ad
     Route::get('/users/region/{regionId}', [UserController::class, 'showUsersByRegion']);
     Route::resource('zones/{zoneId}/woredas', WoredaController::class);
     // Route::resource('user', UserController::class);
-    Route::get('/region-dashboard', [DashboardController::class, 'viewRegion']);
 });
 
 // supervisor routes
@@ -79,3 +80,4 @@ Route::middleware(['auth:sanctum', 'role:region_admin|super_admin'])->group(func
     Route::put('/admin/supervisor/{user_id}/reject', [UserController::class, 'rejectSupervisor']);
 
 });
+
