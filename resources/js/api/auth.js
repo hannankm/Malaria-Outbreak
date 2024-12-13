@@ -1,4 +1,4 @@
-// src/services/auth.js
+// src/api/auth.api.js
 import apiService from "@/utils/apiService";
 
 export default {
@@ -23,4 +23,15 @@ export default {
             throw error;
         }
     },
+
+    // Handle user registration
+    async registerUser(user) {
+        try {
+            const response = await apiService.post("/register", user);
+            return response.data;
+        } catch (error) {
+            console.error("Error registering:", error);
+            throw error;
+        }
+    }
 };

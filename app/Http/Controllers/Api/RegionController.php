@@ -27,6 +27,24 @@ class RegionController extends Controller
     return RegionResource::collection($regionsQuery->get());
 }
 
+// In RegionController.php
+public function dropdown(Request $request)
+{
+    $search = $request->query('search'); // Optional search parameter
+
+    $regionsQuery = Region::query();
+
+    if ($search) {
+        $regionsQuery->where('name', 'like', '%' . $search . '%');
+    }
+
+    return response()->json(
+        $regionsQuery->select('id', 'name')->get()
+    );
+}
+
+
+
     // Store a newly created region
     public function store(Request $request)
     {

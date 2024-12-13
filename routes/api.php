@@ -34,7 +34,14 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
+
 // ->middleware('api')->
+
+
+Route::get('/regions', [RegionController::class, 'index']);
+Route::get('/regions/dropdown', [RegionController::class, 'dropdown']);
+
+
 
 Route::resource('regions', RegionController::class);
 Route::resource('regions/{regionId}/zones', ZoneController::class);
@@ -47,18 +54,18 @@ Route::resource('household-stat/{householdStatId}/malaria-cases', MalariaCaseCon
 
 // Super Admin route
 Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
-    Route::resource('regions', RegionController::class);
-    Route::resource('zones/{zoneId}/woredas', WoredaController::class);
-    Route::resource('regions/{regionId}/zones', ZoneController::class);
+    // Route::resource('regions', RegionController::class);
+    // Route::resource('zones/{zoneId}/woredas', WoredaController::class);
+    // Route::resource('regions/{regionId}/zones', ZoneController::class);
     Route::resource('user', UserController::class);
     Route::get('/dashboard', [DashboardController::class, 'viewAll']);
 });
 
 // Region Admin route
 Route::middleware(['auth:sanctum', 'role:region_admin', 'region_access:region_admin'])->group(function () {
-    Route::resource('regions/{regionId}/zones', ZoneController::class);
+    // Route::resource('regions/{regionId}/zones', ZoneController::class);
     Route::get('/users/region/{regionId}', [UserController::class, 'showUsersByRegion']);
-    Route::resource('zones/{zoneId}/woredas', WoredaController::class);
+    // Route::resource('zones/{zoneId}/woredas', WoredaController::class);
     // Route::resource('user', UserController::class);
     Route::get('/region-dashboard', [DashboardController::class, 'viewRegion']);
 });
@@ -83,4 +90,4 @@ Route::middleware(['auth:sanctum', 'role:region_admin|super_admin'])->group(func
     Route::put('/admin/supervisor/{user_id}/approve', [UserController::class, 'approveSupervisor']);
     Route::put('/admin/supervisor/{user_id}/reject', [UserController::class, 'rejectSupervisor']);
 
-});
+}); 
