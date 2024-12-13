@@ -73,7 +73,7 @@ export default {
                         region_id: response.user.region_id,
                         woreda_id: response.user.woreda_id,
                     },
-                    role: response.role, // Assuming role is an array, we're sending the first role
+                    role: response.role[0],
                 });
                 // console.log(this.$store.getter["user/user"]);
 
@@ -89,8 +89,10 @@ export default {
                 // Redirect to the dashboard
                 if (role === "supervisor") {
                     this.$router.push(`/woredas/${woredaId}/households`);
-                } else if (role === "user") {
-                    this.$router.push("/user-dashboard");
+                } else if (role === "super_admin") {
+                    this.$router.push("/super-admin-dashboard");
+                } else if (role === "region_admin") {
+                    this.$router.push("/region-admin-dashboard");
                 } else {
                     this.$router.push("/"); // Default route
                 }
