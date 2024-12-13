@@ -55,38 +55,39 @@ Route::resource('woredas/{woredaId}/households', HouseholdController::class);
 Route::resource('household/{householdId}/household-stats', HouseholdStatController::class);
 Route::resource('household-stat/{householdStatId}/malaria-cases', MalariaCaseController::class);
 
+Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
+    Route::get('/households', [HouseholdController::class, 'fetchAllHouseholds']);
+
+});
+Route::middleware(['auth:sanctum', 'role:region_admin'])->group(function () {
+    Route::get('/households/by-region', [HouseholdController::class, 'fetchHouseholdsByRegion']);
+
+
+}); 
+Route::get('/households/{householdId}', [HouseholdController::class, 'showHousehold']);
+
 
 
 // Super Admin route
-Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
-    Route::resource('user', UserController::class);
+Route::middleware(['auth:sanctum', 'role:super_admin|region_admin'])->group(function () {
+    Route::resource('/users', UserController::class);
+    Route::patch('/users/{userId}/status', [UserController::class, 'updateUserStatus']);
+
 });
 
 // Region Admin route
 Route::middleware(['auth:sanctum', 'role:region_admin', 'region_access:region_admin'])->group(function () {
     Route::get('/users/region/{regionId}', [UserController::class, 'showUsersByRegion']);
+    
 
 });
 
 // supervisor routes
-Route::middleware(['auth:sanctum', 'region_access:supervisor'])->group(function () {
+Route::middleware(['auth:sanctum' ])->group(function () {
     Route::resource('woredas/{woredaId}/households', HouseholdController::class);
     Route::resource('household/{householdId}/household-stats', HouseholdStatController::class);
     Route::resource('household-stat/{householdStatId}/malaria-cases', MalariaCaseController::class);
 });
 
-// account approval by super admin
-Route::middleware(['auth:sanctum', 'role:super_admin'])->group(function () {
-    Route::put('/admin/region-admin/{user_id}/suspend', [UserController::class, 'suspendRegionAdmin']);
-    Route::put('/admin/region-admin/{user_id}/approve', [UserController::class, 'approveRegionAdmin']);
-    Route::put('/admin/region-admin/{user_id}/reject', [UserController::class, 'rejectRegionAdmin']);
 
-});
-// account approval by reg admin
-Route::middleware(['auth:sanctum', 'role:region_admin|super_admin'])->group(function () {
-    Route::put('/admin/supervisor/{user_id}/suspend', [UserController::class, 'suspendSupervisor']);
-    Route::put('/admin/supervisor/{user_id}/approve', [UserController::class, 'approveSupervisor']);
-    Route::put('/admin/supervisor/{user_id}/reject', [UserController::class, 'rejectSupervisor']);
-
-}); 
 

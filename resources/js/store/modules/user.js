@@ -70,7 +70,6 @@ const getters = {
     userRole: (state) => state.role,
     regionId: (state) => state.user.region_id,
     woredaId: (state) => state.user.woreda_id,
-    authToken: (state) => state.authToken,
 };
 
 export default {

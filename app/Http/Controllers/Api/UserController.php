@@ -322,4 +322,27 @@ class UserController extends Controller
             'permissions' => $user->getAllPermissions()
         ]);
     }
+    public function updateUserStatus(Request $request, $userId)
+{
+    $validator = Validator::make($request->all(), [
+        'status' => 'required|string|in:' . implode(',', [
+            USER::STATUS_PENDING,
+            USER::STATUS_ACTIVE,
+            USER::STATUS_REJECTED,
+            USER::STATUS_SUSPENDED
+        ]),
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $user = User::findOrFail($userId);
+    $user->status = $request->status;
+    $user->save();
+
+    return response()->json(['message' => 'User status updated successfully.']);
+}
 }

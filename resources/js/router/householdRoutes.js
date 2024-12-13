@@ -11,6 +11,19 @@ const householdRoutes = [
         meta: { title: "Households" },
     },
     {
+        path: "/households/by-region",
+        name: "HouseholdViewRegion",
+        component: HouseholdView,
+        meta: { title: "Households" },
+    },
+    {
+        path: "/households/all",
+        name: "HouseholdViewAll",
+        component: HouseholdView,
+        meta: { title: "Households" },
+    },
+
+    {
         path: "/woredas/:woredaId/households/:id",
         name: "HouseholdDetail",
         component: HouseholdDetail,

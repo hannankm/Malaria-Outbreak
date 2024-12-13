@@ -1,24 +1,17 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import UserManagement from '@/views/User/userManagement.vue'; 
-import UserDetails from '@/views/UserDetails.vue'; 
+import UserAdmin from "@/views/User/UserAdmin.vue";
+import RegionAdmin from "@/views/User/RegionAdmin.vue";
 
-const routes = [
-  {
-    path: '/users',
-    name: 'UserManagement',
-    component: UserManagement,
-  },
-  {
-    path: '/users/:id',
-    name: 'UserDetails',
-    component: UserDetails,
-    props: true, // Pass route params as props
-  },
+const userRoutes = [
+    {
+        path: "/users",
+        name: "UserAdmin",
+        component: UserAdmin,
+    },
+    {
+        path: "/users/region",
+        name: "RegionAdmin",
+        component: RegionAdmin,
+    },
 ];
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-});
-
-export default router;
+export default userRoutes;

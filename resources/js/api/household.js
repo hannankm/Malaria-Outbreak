@@ -5,9 +5,6 @@ export const getHouseholds = (searchTerm = "") => {
     const woredaId = store.getters["user/woredaId"];
     const auth = store.getters["user/authToken"];
 
-    alert(woredaId);
-    alert(auth);
-
     // Include searchTerm as a query parameter
     return apiService.get(`/woredas/${woredaId}/households`, {
         params: {
@@ -16,11 +13,36 @@ export const getHouseholds = (searchTerm = "") => {
     });
 };
 
+export const getHouseholdsAll = (searchTerm = "") => {
+    // Include searchTerm as a query parameter
+    return apiService.get(`/households`, {
+        params: {
+            searchTerm, // Pass search term as query parameter
+        },
+    });
+};
+export const getHouseholdsInRegion = (searchTerm = "") => {
+    // Include searchTerm as a query parameter
+    return apiService.get(`/households/by-region`, {
+        params: {
+            searchTerm, // Pass search term as query parameter
+        },
+    });
+};
+
 export const getHouseholdById = (id) => {
+    // Fetch user role and woredaId from the store
+    const userRole = store.getters["user/userRole"];
     const woredaId = store.getters["user/woredaId"];
-    alert(woredaId);
-    alert(id);
-    return apiService.get(`/woredas/${woredaId}/households/${id}`);
+
+    // Check the user role and determine the endpoint
+    if (userRole === "supervisor") {
+        // Fetch based on woreda ID if the role is 'woreda'
+        return apiService.get(`/woredas/${woredaId}/households/${id}`);
+    } else {
+        // Fetch directly from the global household endpoint
+        return apiService.get(`/households/${id}`);
+    }
 };
 
 export const addHousehold = (householdData) => {

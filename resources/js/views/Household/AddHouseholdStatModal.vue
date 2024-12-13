@@ -26,11 +26,22 @@
                     :key="index"
                 >
                     <el-divider>Active Case {{ index + 1 }}</el-divider>
+
                     <el-form-item label="Age Group">
-                        <el-input
+                        <el-select
                             v-model="malariaCase.age_group"
-                            placeholder="Age group"
-                        />
+                            placeholder="Select Age Group"
+                        >
+                            <el-option label="0-1" value="0-1"></el-option>
+                            <el-option label="2-9" value="2-9"></el-option>
+                            <el-option label="10-19" value="10-19"></el-option>
+                            <el-option label="20-29" value="20-29"></el-option>
+                            <el-option label="30-39" value="30-39"></el-option>
+                            <el-option label="40-49" value="40-49"></el-option>
+                            <el-option label="50-59" value="50-59"></el-option>
+                            <el-option label="60-64" value="60-64"></el-option>
+                            <el-option label="65+" value="65+"></el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="Sex">
                         <el-select
@@ -63,11 +74,22 @@
                     :key="index"
                 >
                     <el-divider>Death Case {{ index + 1 }}</el-divider>
+
                     <el-form-item label="Age Group">
-                        <el-input
+                        <el-select
                             v-model="malariaCase.age_group"
-                            placeholder="Age group"
-                        />
+                            placeholder="Select Age Group"
+                        >
+                            <el-option label="0-1" value="0-1"></el-option>
+                            <el-option label="2-9" value="2-9"></el-option>
+                            <el-option label="10-19" value="10-19"></el-option>
+                            <el-option label="20-29" value="20-29"></el-option>
+                            <el-option label="30-39" value="30-39"></el-option>
+                            <el-option label="40-49" value="40-49"></el-option>
+                            <el-option label="50-59" value="50-59"></el-option>
+                            <el-option label="60-64" value="60-64"></el-option>
+                            <el-option label="65+" value="65+"></el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="Sex">
                         <el-select
@@ -100,11 +122,22 @@
                     :key="index"
                 >
                     <el-divider>New Case {{ index + 1 }}</el-divider>
+
                     <el-form-item label="Age Group">
-                        <el-input
+                        <el-select
                             v-model="malariaCase.age_group"
-                            placeholder="Age group"
-                        />
+                            placeholder="Select Age Group"
+                        >
+                            <el-option label="0-1" value="0-1"></el-option>
+                            <el-option label="2-9" value="2-9"></el-option>
+                            <el-option label="10-19" value="10-19"></el-option>
+                            <el-option label="20-29" value="20-29"></el-option>
+                            <el-option label="30-39" value="30-39"></el-option>
+                            <el-option label="40-49" value="40-49"></el-option>
+                            <el-option label="50-59" value="50-59"></el-option>
+                            <el-option label="60-64" value="60-64"></el-option>
+                            <el-option label="65+" value="65+"></el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="Sex">
                         <el-select
@@ -137,12 +170,24 @@
                     :key="index"
                 >
                     <el-divider>Recovered Case {{ index + 1 }}</el-divider>
+
                     <el-form-item label="Age Group">
-                        <el-input
+                        <el-select
                             v-model="malariaCase.age_group"
-                            placeholder="Age group"
-                        />
+                            placeholder="Select Age Group"
+                        >
+                            <el-option label="0-1" value="0-1"></el-option>
+                            <el-option label="2-9" value="2-9"></el-option>
+                            <el-option label="10-19" value="10-19"></el-option>
+                            <el-option label="20-29" value="20-29"></el-option>
+                            <el-option label="30-39" value="30-39"></el-option>
+                            <el-option label="40-49" value="40-49"></el-option>
+                            <el-option label="50-59" value="50-59"></el-option>
+                            <el-option label="60-64" value="60-64"></el-option>
+                            <el-option label="65+" value="65+"></el-option>
+                        </el-select>
                     </el-form-item>
+
                     <el-form-item label="Sex">
                         <el-select
                             v-model="malariaCase.sex"
@@ -174,11 +219,22 @@
                     :key="index"
                 >
                     <el-divider>At Risk {{ index + 1 }}</el-divider>
+
                     <el-form-item label="Age Group">
-                        <el-input
+                        <el-select
                             v-model="malariaCase.age_group"
-                            placeholder="Age group"
-                        />
+                            placeholder="Select Age Group"
+                        >
+                            <el-option label="0-1" value="0-1"></el-option>
+                            <el-option label="2-9" value="2-9"></el-option>
+                            <el-option label="10-19" value="10-19"></el-option>
+                            <el-option label="20-29" value="20-29"></el-option>
+                            <el-option label="30-39" value="30-39"></el-option>
+                            <el-option label="40-49" value="40-49"></el-option>
+                            <el-option label="50-59" value="50-59"></el-option>
+                            <el-option label="60-64" value="60-64"></el-option>
+                            <el-option label="65+" value="65+"></el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="Sex">
                         <el-select
@@ -289,12 +345,12 @@ export default {
                 // Creating an object for household statistics
                 const householdStatData = {
                     no_of_active_cases:
-                        this.newHouseholdStat.no_of_active_cases,
-                    no_of_death: this.newHouseholdStat.no_of_death,
+                        this.newHouseholdStat.no_of_active_cases || 0,
+                    no_of_death: this.newHouseholdStat.no_of_death || 0,
                     no_of_people_at_risk:
-                        this.newHouseholdStat.no_of_people_at_risk,
-                    no_of_new_cases: this.newHouseholdStat.no_of_new_cases,
-                    no_of_recovered: this.newHouseholdStat.no_of_recovered,
+                        this.newHouseholdStat.no_of_people_at_risk || 0,
+                    no_of_new_cases: this.newHouseholdStat.no_of_new_cases || 0,
+                    no_of_recovered: this.newHouseholdStat.no_of_recovered || 0,
                 };
 
                 // Creating an array for malaria cases

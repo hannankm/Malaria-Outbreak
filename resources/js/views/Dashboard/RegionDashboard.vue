@@ -1,7 +1,5 @@
 <template>
     <div>
-        <h1>Super Admin Dashboard</h1>
-
         <!-- Region selection -->
 
         <!-- Summation Data Cards -->
@@ -52,19 +50,21 @@
         <!-- Graph Data: Pie and Bar Charts -->
         <div class="charts-container">
             <!-- Diagnosed Pie Chart -->
-            <div class="chart-container">
-                <div ref="diagnosedPieChart" class="chart"></div>
-            </div>
-
-            <!-- Age Group Bar Chart -->
-            <div class="chart-container">
-                <div ref="ageGroupBarChart" class="chart"></div>
-            </div>
-
-            <!-- Gender Pie Chart -->
-            <div class="chart-container">
-                <div ref="genderPieChart" class="chart"></div>
-            </div>
+            <div
+                class="chart-container"
+                style="width: 100%; height: 400px"
+                ref="diagnosedPieChart"
+            ></div>
+            <div
+                class="chart-container"
+                style="width: 100%; height: 400px"
+                ref="ageGroupBarChart"
+            ></div>
+            <div
+                class="chart-container"
+                style="width: 100%; height: 400px"
+                ref="genderPieChart"
+            ></div>
         </div>
     </div>
 </template>
@@ -91,10 +91,16 @@ export default {
         };
     },
     mounted() {
-        this.fetchSuperAdminDashboardData();
+        this.fetchRegionAdminDashboardData();
+
+        // Initialize charts once DOM elements are available
+        this.$nextTick(() => {
+            this.initializeCharts();
+        });
     },
+
     methods: {
-        fetchSuperAdminDashboardData() {
+        fetchRegionAdminDashboardData() {
             apiService
                 .get(`/dashboard`)
                 .then((response) => {
@@ -107,6 +113,30 @@ export default {
                         error
                     );
                 });
+        },
+        initializeCharts() {
+            console.log("Initializing charts...");
+            this.$nextTick(() => {
+                if (!this.diagnosedPieChartInstance) {
+                    console.log("Initializing diagnosedPieChartInstance...");
+                    this.diagnosedPieChartInstance = echarts.init(
+                        this.$refs.diagnosedPieChart
+                    );
+                }
+                if (!this.ageGroupBarChartInstance) {
+                    console.log("Initializing ageGroupBarChartInstance...");
+                    this.ageGroupBarChartInstance = echarts.init(
+                        this.$refs.ageGroupBarChart
+                    );
+                }
+                if (!this.genderPieChartInstance) {
+                    console.log("Initializing genderPieChartInstance...");
+                    this.genderPieChartInstance = echarts.init(
+                        this.$refs.genderPieChart
+                    );
+                }
+                this.updateCharts();
+            });
         },
 
         updateCharts() {
@@ -128,8 +158,10 @@ export default {
                             radius: "50%",
                             data: this.dashboardData.graph_data.by_diagnosed.map(
                                 (item) => ({
-                                    value: item.value,
-                                    name: item.diagnosed_status,
+                                    value: item.total,
+                                    name: item.diagnosed
+                                        ? "Diagnosed"
+                                        : "Not Diagnosed",
                                 })
                             ),
                             emphasis: {
@@ -166,9 +198,10 @@ export default {
                     series: [
                         {
                             data: this.dashboardData.graph_data.by_age_group.map(
-                                (item) => item.value
+                                (item) => item.total
                             ),
                             type: "bar",
+                            color: "#4caf50", // Example color
                         },
                     ],
                 });
@@ -192,8 +225,8 @@ export default {
                             radius: "50%",
                             data: this.dashboardData.graph_data.by_gender.map(
                                 (item) => ({
-                                    value: item.value,
-                                    name: item.gender,
+                                    value: item.total,
+                                    name: item.sex,
                                 })
                             ),
                             emphasis: {
@@ -210,39 +243,14 @@ export default {
         },
     },
 
-    beforeDestroy() {
-        // Dispose of the chart instances when the component is destroyed
-        if (this.diagnosedPieChartInstance)
-            this.diagnosedPieChartInstance.dispose();
-        if (this.ageGroupBarChartInstance)
-            this.ageGroupBarChartInstance.dispose();
-        if (this.genderPieChartInstance) this.genderPieChartInstance.dispose();
-    },
-    updated() {
-        // Reinitialize charts if needed after data change
-        if (this.dashboardData && this.dashboardData.graph_data.by_diagnosed) {
-            if (!this.diagnosedPieChartInstance) {
-                this.diagnosedPieChartInstance = echarts.init(
-                    this.$refs.diagnosedPieChart
-                );
-                this.updateCharts();
-            }
-
-            if (!this.ageGroupBarChartInstance) {
-                this.ageGroupBarChartInstance = echarts.init(
-                    this.$refs.ageGroupBarChart
-                );
-                this.updateCharts();
-            }
-
-            if (!this.genderPieChartInstance) {
-                this.genderPieChartInstance = echarts.init(
-                    this.$refs.genderPieChart
-                );
-                this.updateCharts();
-            }
-        }
-    },
+    // beforeDestroy() {
+    //     // Dispose of the chart instances when the component is destroyed
+    //     if (this.diagnosedPieChartInstance)
+    //         this.diagnosedPieChartInstance.dispose();
+    //     if (this.ageGroupBarChartInstance)
+    //         this.ageGroupBarChartInstance.dispose();
+    //     if (this.genderPieChartInstance) this.genderPieChartInstance.dispose();
+    // },
 };
 </script>
 

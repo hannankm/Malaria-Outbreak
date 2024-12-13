@@ -42,7 +42,11 @@
 </template>
 
 <script>
-import { getHouseholds } from "@/api/household";
+import {
+    getHouseholds,
+    getHouseholdsAll,
+    getHouseholdsInRegion,
+} from "@/api/household";
 
 export default {
     name: "HouseholdView",
@@ -53,19 +57,47 @@ export default {
             searchTerm: "", // Stores the search term
         };
     },
+    computed: {
+        role() {
+            return this.$store.getters["user/userRole"]; // Fetch user role directly
+        },
+        woredaId() {
+            return this.$store.getters["user/woredaId"]; // Fetch woredaId directly
+        },
+    },
+
     methods: {
         // Fetch households from API
         async fetchHouseholds() {
             try {
-                const response = await getHouseholds();
-                this.households = response.data.data || [];
+                let response; // Declare 'response' once with 'let'
+
+                // Handle different roles and fetch data accordingly
+                if (this.$store.getters["user/userRole"] === "supervisor") {
+                    response = await getHouseholds({
+                        woredaId: this.$store.getters["user/woredaId"],
+                    });
+                } else if (
+                    this.$store.getters["user/userRole"] === "region_admin"
+                ) {
+                    response = await getHouseholdsInRegion();
+                } else if (
+                    this.$store.getters["user/userRole"] === "super_admin"
+                ) {
+                    response = await getHouseholdsAll();
+                } else {
+                    throw new Error("Role not authorized to fetch households");
+                }
+
+                // Set the data to households and filteredHouseholds
+                this.households = response.data.data;
                 this.filteredHouseholds = [...this.households]; // Initialize filteredHouseholds
+
                 console.log(response.data); // Check the actual response
             } catch (error) {
                 console.error("Error fetching households:", error);
             }
         },
-
         // Handle the search logic
         onSearch() {
             if (this.searchTerm.trim() === "") {

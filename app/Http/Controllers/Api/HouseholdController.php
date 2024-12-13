@@ -8,6 +8,8 @@ use App\Http\Resources\HouseholdResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+
 
 
 class HouseholdController extends Controller
@@ -44,6 +46,59 @@ class HouseholdController extends Controller
     // Return households as a collection
     return HouseholdResource::collection($households);
 }
+
+public function fetchAllHouseholds(Request $request)
+{
+    // Initialize query builder for households
+    $query = Household::query();
+
+    // Check if there's a search query in the request
+    if ($request->has('search') && $request->search != '') {
+        $searchTerm = $request->search;
+
+        // Apply search filters
+        $query->where(function ($q) use ($searchTerm) {
+            $q->where('house_number', 'like', '%' . $searchTerm . '%')
+              ->orWhere('full_name', 'like', '%' . $searchTerm . '%')
+              ->orWhere('location', 'like', '%' . $searchTerm . '%');
+        });
+    }
+
+    // Fetch households
+    $households = $query->get();
+
+    return HouseholdResource::collection($households);
+}
+
+public function fetchHouseholdsByRegion(Request $request)
+{
+    // Get the authenticated user's region ID
+    $userRegionId = Auth::user()->region_id;
+
+    // Initialize query for households with relationships
+    $query = Household::whereHas('woreda.zone.region', function ($q) use ($userRegionId) {
+        $q->where('id', $userRegionId);
+    });
+
+    // Check if there's a search query in the request
+    if ($request->has('search') && $request->search != '') {
+        $searchTerm = $request->search;
+
+        // Apply search filters
+        $query->where(function ($q) use ($searchTerm) {
+            $q->where('house_number', 'like', '%' . $searchTerm . '%')
+              ->orWhere('full_name', 'like', '%' . $searchTerm . '%')
+              ->orWhere('location', 'like', '%' . $searchTerm . '%');
+        });
+    }
+
+    // Fetch households
+    $households = $query->get();
+
+    return HouseholdResource::collection($households);
+}
+
+
 
 
     /**
@@ -83,74 +138,7 @@ class HouseholdController extends Controller
         return new HouseholdResource($household);
     }
 
-    /**
-     * Display the specified household.
-     *
-     * @param  int  $woredaId
-     * @param  int  $householdId
-     * @return \Illuminate\Http\Response
-     */
-    // public function show($id)
-    // {
-    //     // Step 1: Retrieve the household data along with stats and malaria cases
-    //     $household = Household::with(['householdStats.malariaCases'])
-    //         ->where('id', $id)
-    //         ->firstOrFail();
-
-    //     // Step 2: Transform the household stats to include grouped malaria cases
-    //     $householdStats = $household->householdStats->map(function ($stat) {
-    //         return [
-    //             'id' => $stat->id,
-    //             'no_of_active_cases' => $stat->no_of_active_cases,
-    //             'no_of_death' => $stat->no_of_death,
-    //             'no_of_people_at_risk' => $stat->no_of_people_at_risk,
-    //             'no_of_recovered' => $stat->no_of_recovered,
-    //             'date' => $stat->date,
-    //             'malaria_cases' => $this->groupMalariaCases($stat->malariaCases),
-    //         ];
-    //     });
-
-    //     // Step 3: Build the response
-    //     $response = [
-    //         'id' => $household->id,
-    //         'full_name' => $household->full_name,
-    //         'phone_number' => $household->phone_number,
-    //         'house_number' => $household->house_number,
-    //         'spouse_name' => $household->spouse_name,
-    //         'spouse_phone_number' => $household->spouse_phone_number,
-    //         'no_of_adults' => $household->no_of_adults,
-    //         'no_of_children' => $household->no_of_children,
-    //         'location' => $household->location,
-    //         'supervisor' => $household->supervisor,
-    //         'woreda' => [
-    //             'id' => $household->woreda->id,
-    //             'name' => $household->woreda->name,
-    //             'zone_id' => $household->woreda->zone_id,
-    //         ],
-    //         'household_stats' => $householdStats,
-    //     ];
-
-    //     return response()->json(['data' => $response]);
-    // }
-
-    // /**
-    //  * Group malaria cases by their status.
-    //  */
-    // private function groupMalariaCases($malariaCases)
-    // {
-    //     return $malariaCases->groupBy('status')->map(function ($cases, $status) {
-    //         return $cases->map(function ($case) {
-    //             return [
-    //                 'id' => $case->id,
-    //                 'age_group' => $case->age_group,
-    //                 'sex' => $case->sex,
-    //                 'diagnosed' => $case->diagnosed,
-    //             ];
-    //         });
-    //     });
-    // }
-    
-
+ 
     public function show($woredaId, $householdId)
     {
         // Find the woreda
@@ -171,6 +159,24 @@ class HouseholdController extends Controller
         // Return the household as a resource
         return new HouseholdResource($household);
     }
+
+    public function showHousehold($householdId)
+{
+    // Find the specific household and load stats with malaria cases grouped by status
+    $household = Household::with(['householdStats.malariaCases' => function ($query) {
+                        $query->orderBy('status'); // Optional: Order cases by status
+                    }])
+                    ->findOrFail($householdId);
+
+    // Group malaria cases by status in stats after fetching
+    $household->householdStats->each(function ($stat) {
+        $stat->grouped_malaria_cases = $stat->malariaCases->groupBy('status');
+    });
+
+    // Return the household as a resource
+    return new HouseholdResource($household);
+}
+
     
     
     

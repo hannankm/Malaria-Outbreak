@@ -1,6 +1,5 @@
 <template>
     <div class="login">
-        <Navigation />
         <el-card class="login-card">
             <h2>Login</h2>
             <el-form :model="loginForm" @submit.prevent="handleLogin">
@@ -40,7 +39,7 @@
 </template>
 
 <script>
-import Navigation from '../../layouts/components/Navigation.vue';
+import Navigation from "@/layouts/components/Navigation.vue";
 import auth from "@/api/auth";
 import { mapActions } from "vuex";
 
