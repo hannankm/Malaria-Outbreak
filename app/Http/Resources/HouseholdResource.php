@@ -24,10 +24,12 @@ class HouseholdResource extends JsonResource
             'no_of_adults' => $this->no_of_adults,
             'no_of_children' => $this->no_of_children,
             'location' => $this->location,
-            'supervisor' => new UserResource($this->supervisor),
+            'supervisor' => $this->supervisor_id,
             'woreda' => new WoredaResource($this->woreda),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'household_stats' => HouseholdStatResource::collection($this->whenLoaded('householdStats')),
+
         ];
     }
 }

@@ -20,13 +20,23 @@ class HouseholdStatResource extends JsonResource
             'no_of_death' => $this->no_of_death,
             'no_of_people_at_risk' => $this->no_of_people_at_risk,
             'no_of_recovered' => $this->no_of_recovered,
+            'no_of_new_cases' => $this->no_of_new_cases,
             'date' => $this->date,
             'household_id' => $this->household_id,
             'supervisor_id' => $this->supervisor_id,
-            'household' => new HouseholdResource($this->household),  // Optional, if you want to include Household data
-            'supervisor' => new UserResource($this->supervisor),  // Optional, if you want to include Supervisor data
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'malaria_cases' => $this->grouped_malaria_cases 
+    ? [
+        'grouped_by_status' => $this->grouped_malaria_cases->map(function ($cases, $status) {
+            return [
+                'status' => $status,
+                'cases' => MalariaCaseResource::collection($cases),
+            ];
+        }),
+    ] 
+    : null,
+
         ];
         }
 }

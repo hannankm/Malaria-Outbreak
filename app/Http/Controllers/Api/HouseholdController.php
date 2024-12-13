@@ -75,7 +75,7 @@ class HouseholdController extends Controller
             'no_of_adults' => $request->no_of_adults,
             'no_of_children' => $request->no_of_children,
             'location' => $request->location,
-            'supervisor_id' => $request->supervisor_id,
+            'supervisor_id' =>auth()->id(),
             'woreda_id' => $woreda->id, // Assign the woreda ID
         ]);
 
@@ -90,17 +90,90 @@ class HouseholdController extends Controller
      * @param  int  $householdId
      * @return \Illuminate\Http\Response
      */
+    // public function show($id)
+    // {
+    //     // Step 1: Retrieve the household data along with stats and malaria cases
+    //     $household = Household::with(['householdStats.malariaCases'])
+    //         ->where('id', $id)
+    //         ->firstOrFail();
+
+    //     // Step 2: Transform the household stats to include grouped malaria cases
+    //     $householdStats = $household->householdStats->map(function ($stat) {
+    //         return [
+    //             'id' => $stat->id,
+    //             'no_of_active_cases' => $stat->no_of_active_cases,
+    //             'no_of_death' => $stat->no_of_death,
+    //             'no_of_people_at_risk' => $stat->no_of_people_at_risk,
+    //             'no_of_recovered' => $stat->no_of_recovered,
+    //             'date' => $stat->date,
+    //             'malaria_cases' => $this->groupMalariaCases($stat->malariaCases),
+    //         ];
+    //     });
+
+    //     // Step 3: Build the response
+    //     $response = [
+    //         'id' => $household->id,
+    //         'full_name' => $household->full_name,
+    //         'phone_number' => $household->phone_number,
+    //         'house_number' => $household->house_number,
+    //         'spouse_name' => $household->spouse_name,
+    //         'spouse_phone_number' => $household->spouse_phone_number,
+    //         'no_of_adults' => $household->no_of_adults,
+    //         'no_of_children' => $household->no_of_children,
+    //         'location' => $household->location,
+    //         'supervisor' => $household->supervisor,
+    //         'woreda' => [
+    //             'id' => $household->woreda->id,
+    //             'name' => $household->woreda->name,
+    //             'zone_id' => $household->woreda->zone_id,
+    //         ],
+    //         'household_stats' => $householdStats,
+    //     ];
+
+    //     return response()->json(['data' => $response]);
+    // }
+
+    // /**
+    //  * Group malaria cases by their status.
+    //  */
+    // private function groupMalariaCases($malariaCases)
+    // {
+    //     return $malariaCases->groupBy('status')->map(function ($cases, $status) {
+    //         return $cases->map(function ($case) {
+    //             return [
+    //                 'id' => $case->id,
+    //                 'age_group' => $case->age_group,
+    //                 'sex' => $case->sex,
+    //                 'diagnosed' => $case->diagnosed,
+    //             ];
+    //         });
+    //     });
+    // }
+    
+
     public function show($woredaId, $householdId)
     {
         // Find the woreda
         $woreda = Woreda::findOrFail($woredaId);
-
-        // Find the specific household within the woreda
-        $household = $woreda->households()->findOrFail($householdId);
-
+    
+        // Find the specific household and load stats with malaria cases grouped by status
+        $household = $woreda->households()
+                            ->with(['householdStats.malariaCases' => function ($query) {
+                                $query->orderBy('status'); // Optional: Order cases by status
+                            }])
+                            ->findOrFail($householdId);
+    
+        // Group malaria cases by status in stats after fetching
+        $household->householdStats->each(function ($stat) {
+            $stat->grouped_malaria_cases = $stat->malariaCases->groupBy('status');
+        });
+    
         // Return the household as a resource
         return new HouseholdResource($household);
     }
+    
+    
+    
 
     /**
      * Update the specified household.
@@ -171,7 +244,6 @@ class HouseholdController extends Controller
             'no_of_adults' => 'required|integer',
             'no_of_children' => 'required|integer',
             'location' => 'required|string|max:255',
-            'supervisor_id' => 'required|exists:users,id',
         ]);
     }
 }

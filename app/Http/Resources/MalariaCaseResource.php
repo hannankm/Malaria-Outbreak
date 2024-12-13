@@ -21,7 +21,6 @@ class MalariaCaseResource extends JsonResource
             'sex' => $this->sex,
             'diagnosed' => $this->diagnosed,
             'household_stat_id' => $this->household_stat_id,
-            'household_stat' => new HouseholdStatResource($this->household_stat), // Include household_stat relationship
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

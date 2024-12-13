@@ -38,31 +38,32 @@ class HouseholdStatController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request, $householdId)
-    {
-        // Validate the request data
-        $validator = $this->validateHouseholdStatData($request);
+{
+    // Validate the request data
+    $validator = $this->validateHouseholdStatData($request);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        // Find the household
-        $household = Household::findOrFail($householdId);
-
-        // Create the household stat
-        $householdStat = HouseholdStat::create([
-            'no_of_active_cases' => $request->no_of_active_cases,
-            'no_of_death' => $request->no_of_death,
-            'no_of_people_at_risk' => $request->no_of_people_at_risk,
-            'no_of_recovered' => $request->no_of_recovered,
-            'date' => $request->date ?? now(),
-            'household_id' => $household->id,
-            'supervisor_id' => $request->supervisor_id,
-        ]);
-
-        // Return the created household stat as a resource
-        return new HouseholdStatResource($householdStat);
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422);
     }
+
+    // Find the household
+    $household = Household::findOrFail($householdId);
+
+    // Create the household stat
+    $householdStat = HouseholdStat::create([
+        'no_of_active_cases' => $request->no_of_active_cases,
+        'no_of_death' => $request->no_of_death,
+        'no_of_people_at_risk' => $request->no_of_people_at_risk,
+        'no_of_recovered' => $request->no_of_recovered,
+        'date' => $request->date ?? now(),
+        'household_id' => $household->id,
+        'supervisor_id' =>auth()->id(),
+    ]);
+
+    // Return the created household stat as a resource
+    return new HouseholdStatResource($householdStat);
+}
+
 
     /**
      * Display the specified household stat.
@@ -149,7 +150,7 @@ class HouseholdStatController extends Controller
             'no_of_people_at_risk' => 'required|integer',
             'no_of_recovered' => 'required|integer',
             'date' => 'date',
-            'supervisor_id' => 'required|exists:users,id',
+            'supervisor_id' => 'exists:users,id',
         ]);
     }
 }
